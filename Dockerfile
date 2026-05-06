@@ -1,5 +1,5 @@
 # Stage 1: Build Angular App
-FROM node:22-alpine AS build
+FROM node:20-alpine AS build
 
 WORKDIR /app
 
@@ -9,23 +9,26 @@ COPY package*.json ./
 # Install dependencies
 RUN npm install
 
-# Copy all project files
+# Install Angular CLI globally
+RUN npm install -g @angular/cli
+
+# Copy project files
 COPY . .
 
-# Build Angular app
-RUN npm run build
+# Give permission to ng
+RUN chmod +x ./node_modules/.bin/ng
 
-# Stage 2: Serve with Nginx
+# Build Angular app
+RUN ng build
+
+# Stage 2: Nginx
 FROM nginx:alpine
 
-# Remove default nginx files
 RUN rm -rf /usr/share/nginx/html/*
 
-# Copy Angular build files
+# Angular 17 output path
 COPY --from=build /app/dist/healthybazar/browser /usr/share/nginx/html
 
-# Expose port
 EXPOSE 80
 
-# Start nginx
 CMD ["nginx", "-g", "daemon off;"]
