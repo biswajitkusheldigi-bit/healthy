@@ -11,6 +11,7 @@ import { ConsultationCalendarComponent } from './modules/consultation-calendar/c
 import { SelfHealthAssessmentComponent } from './modules/self-health-assessment/self-health-assessment.component';
 import { bulkSuccessGuard } from './guards/bulk-success.guard';
 import { ProductRedirectGuard } from './guards/product-redirect.guard';
+import { productResolver } from './modules/shop/pages/product-details/product.resolver';
 
 export const routes: Routes = [
   {
@@ -130,6 +131,7 @@ export const routes: Routes = [
         (comp) => comp.ProductDetailsDeskComponent,
       ),
     data: { mobileHeader: true },
+    resolve: { productData: productResolver }
   },
 
   {

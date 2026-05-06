@@ -25,7 +25,7 @@ import { CartService } from '../../../../../services/cart.service';
 import { ToastrService } from 'ngx-toastr';
 import { CommonService } from '../../../../../services/common.service';
 import { GuestCartService } from '../../../../../services/guest-cart.service';
-import { Subscription } from 'rxjs';
+import { Subscription, of } from 'rxjs';
 import { ProductQuantityControlComponent } from '../../../../../components/product-quantity-control/product-quantity-control.component';
 import { CartData } from '../../../../../shared/types/index.types';
 import {
@@ -141,12 +141,14 @@ export class ProductDetailsDeskComponent
   ngOnInit(): void {
     //console.log('[product-details-desk.component]', this.activatedRoute.snapshot.data)
 
-    this.activatedRoute.params.subscribe((res: any) => {
-      this.slug = res['product-slug'];
-      if (this._slug) {
-        this.slug = this._slug;
-      }
-      this.getProductDetails(this._slug || this.slug);
+    this.activatedRoute.data.subscribe((data: any) => {
+      this.activatedRoute.params.subscribe((res: any) => {
+        this.slug = res['product-slug'];
+        if (this._slug) {
+          this.slug = this._slug;
+        }
+        this.getProductDetails(this._slug || this.slug, data.productData);
+      });
     });
     this.subscriptions$.push(
       this.cartService
@@ -417,10 +419,13 @@ export class ProductDetailsDeskComponent
 
   // as per new update and satinder sir instruction
 
-  getProductDetails(slug: any) {
+  getProductDetails(slug: any, preloadedData: any = null) {
     this.noProductFound = false;
     this.spinner.show();
-    this.productservice.getProductsDetailsPage(slug).subscribe(
+    
+    const source$ = preloadedData ? of({ data: preloadedData }) : this.productservice.getProductsDetailsPage(slug);
+    
+    source$.subscribe(
       (res: any) => {
         this.spinner.hide();
         const { data } = res;
