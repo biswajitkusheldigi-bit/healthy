@@ -1,23 +1,27 @@
 name: image build and push
+
 on:
   workflow_dispatch:
+
 jobs:
-    build:
-        runs-on: ubuntu-latest
-        steps:
-        - name: Checkout Source
-          uses: actions/checkout@v4
-    
-        - name: Login to DockerHub
-          uses: docker/login-action@v2
-          with:
-            username: ${{ secrets.DOCKER_USERNAME }}
-            password: ${{ secrets.DOCKER_PASSWORD }}
-    
-        - name: Build and Push Docker Image
-          uses: docker/build-push-action@v3
-          with:  
-            context: .
-            push: true
-            tags: ${{ secrets.DOCKER_USERNAME }}/healthybazzar-kds:latest
-            tags: ${{ secrets.DOCKER_USERNAME }}/healthybazzar-kds:${{ github.sha }}
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout Source
+        uses: actions/checkout@v4
+
+      - name: Login to DockerHub
+        uses: docker/login-action@v3
+        with:
+          username: ${{ secrets.DOCKER_USERNAME }}
+          password: ${{ secrets.DOCKER_PASSWORD }}
+
+      - name: Build and Push Docker Image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ${{ secrets.DOCKER_USERNAME }}/healthybazzar-kds:latest
+            ${{ secrets.DOCKER_USERNAME }}/healthybazzar-kds:${{ github.sha }}
